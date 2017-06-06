@@ -1,6 +1,8 @@
 package music;
 
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 
 import javax.swing.JPanel;
@@ -18,9 +20,22 @@ public class MusicScrollerWrapper2 extends JPanel {
 	 */
 	public MusicScrollerWrapper2(AudioFile af, int width, int height) {
 		mscScoll2 = new MusicScroller2(af);
-		this.setLayout(new GridLayout(1, 1));		
+		
+		
+//		this.setLayout(new GridLayout(1, 1));		
+//		mscScoll2.setBounds(0,0,width,height);
+//		add(mscScoll2);	
+
+
+		this.setLayout(new GridBagLayout());
 		mscScoll2.setBounds(0,0,width,height);
-		add(mscScoll2);	
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill=GridBagConstraints.HORIZONTAL;
+		c.ipadx=width;
+		c.gridx=0;
+		c.gridy=0;
+		add(mscScoll2, c);
+
 		repaint();
 	}
 

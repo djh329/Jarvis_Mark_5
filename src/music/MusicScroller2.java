@@ -14,6 +14,7 @@ public class MusicScroller2 extends JPanel{
 	private int XPosOnLine=0;
 	private AudioFile af;
 	private Timer t;
+	private boolean isRunning=false;
 
 	public MusicScroller2(AudioFile af) {
 		this.af=af;
@@ -21,18 +22,22 @@ public class MusicScroller2 extends JPanel{
 	}
 
 	public void start() {
+		isRunning=true;
 		ActionListener TTask = new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				double curFrac = ((double) af.getCurrentPos())/af.getSize();
-				if(curFrac>=0) {
+				if(curFrac>=0 && isRunning) {
 					setPos(curFrac);
 					repaint();
 					System.out.println("Im repainting");
 				}
 				else {
-					setPos(0);
+					System.out.println("in the else part");
+					if(af.getCurrentPos()<0) {
+						setPos(0);
+					}
 					repaint();
 					t.stop();
 				}
@@ -46,6 +51,7 @@ public class MusicScroller2 extends JPanel{
 
 	public void stop() {
 		repaint();
+		isRunning=false;
 	}
 
 	@Override
@@ -62,7 +68,7 @@ public class MusicScroller2 extends JPanel{
 	}
 
 	public boolean isRunning() {
-		return false;
+		return isRunning;
 	}
 
 }
