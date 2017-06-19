@@ -107,11 +107,11 @@ public class audioGUI extends JFrame {
 		//mscScroll = new MusicScroller(af, this.getWidth(), 40);
 		//mscScroll.setLocation(0, 149);
 		//contentPane.add(mscScroll);
-		
-//		mscScroll2 = new MusicScroller2(af);
-//		mscScroll2.setBounds(0, 149, 350, 50);
-//		contentPane.add(mscScroll2);
-		
+
+		//		mscScroll2 = new MusicScroller2(af);
+		//		mscScroll2.setBounds(0, 149, 350, 50);
+		//		contentPane.add(mscScroll2);
+
 		mscScroll3 = new MusicScrollerWrapper2(af,350,50);
 		mscScroll3.setBounds(0, 149, 350, 50);
 		contentPane.add(mscScroll3);
@@ -130,20 +130,24 @@ public class audioGUI extends JFrame {
 			//mscScroll.start();
 			mscScroll3.start();
 		}
-		
+
 	}
 
 	public void pause() {
 		if(myAudioFile.isPlaying()) {
 			myAudioFile.pause();
 			//mscScroll.stop();
-			mscScroll3.stop();
+
 		}
 	}
 
 	/**Only to be called by an AudioPlayer or other parents*/
 	protected void stop() {
-		pause();
+		if(myAudioFile.isPlaying()) {
+			pause();
+			mscScroll3.stop();
+		}
+
 	}
 
 	public void restart() {

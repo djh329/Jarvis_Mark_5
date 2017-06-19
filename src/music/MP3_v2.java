@@ -24,6 +24,7 @@ public class MP3_v2 implements AudioFile {
 	AudioFormat aForm;
 	int numBytes;
 	int framesPerSec;
+	int numTracks;
 	private static AtomicInteger currentLoc=new AtomicInteger(0);
 	private boolean isPlaying;
 	DataLine.Info info = new DataLine.Info(SourceDataLine.class, aForm);
@@ -78,12 +79,13 @@ public class MP3_v2 implements AudioFile {
 			System.out.println("in mp3v2 constructor");
 			//TODO for trial purposes, leave below line
 			filename = "/Users/daniel/Documents/Jarvis/Jarvis Mark 3/Avicii Wake Me Up.wav";
-			filename = "/Users/daniel/Downloads/freetts-1.2.2-bin/freetts-1.2/docs/audio/cookiecooks.wav";
+			//filename = "/Users/daniel/Downloads/freetts-1.2.2-bin/freetts-1.2/docs/audio/cookiecooks.wav";
 			this.filename=filename;
 			ais = AudioSystem.getAudioInputStream(new File(filename));
 			numBytes = ais.available();
 			aForm = ais.getFormat();
 			framesPerSec = (int) aForm.getFrameRate();
+			numTracks=ais.getFormat().getChannels();
 			System.out.println("Frame rate: " + framesPerSec);
 		}
 		catch (UnsupportedAudioFileException e) {e.printStackTrace();}
@@ -92,7 +94,6 @@ public class MP3_v2 implements AudioFile {
 
 	}
 
-	/**Starts the audiotrack from the beginning of the file*/
 	public void play() {
 		new Thread() {
 			public void run() {
@@ -123,27 +124,19 @@ public class MP3_v2 implements AudioFile {
 
 	}
 
-	/**Pauses the audiotrack and marks the current location*/
 	public void pause() {
 		System.out.println("Pause");
 		isPlaying=false;
 	}
 
-	/**Pauses the AudioFile and restores values to default*/
 	public void stop() {
 		pause();
 		currentLoc.getAndSet(0);
 	}
 
-	/**If the audiotrack is paused, plays the audiotrack from the current position*/
 	public synchronized void restart() {
 		pause();
-		try{
-			ais=AudioSystem.getAudioInputStream(new File(filename));
-			numBytes = ais.available();
-		}
-		catch (Exception e) {e.printStackTrace();System.exit(1);}
-
+		reboot();
 		currentLoc.getAndSet(0);
 		System.out.println("Current Location is: " + currentLoc.get());
 
@@ -158,39 +151,49 @@ public class MP3_v2 implements AudioFile {
 					}}, 1000);
 	}
 
-	/**Returns the current frame of the song*/ 
-	public int getCurrentFrame() {
-		return currentLoc.get();
+	/**Reloads the file so it can be played from a previous position*/
+	private void reboot() {
+		try{
+			ais=AudioSystem.getAudioInputStream(new File(filename));
+			numBytes = ais.available();
+		}
+		catch (Exception e) {e.printStackTrace();System.exit(1);}
 	}
 
-	/**Returns true if the song is playing*/
 	public boolean isPlaying() {
 		return isPlaying;
 	}
 
-	/**Returns the size of the file in beats*/
 	public int getSize() {
 		return numBytes;
 	}
 
-	/**Returns the currentPosition of the song in frames*/ 
 	public int getCurrentPos() {
 		return currentLoc.get();
 	}
 
-	/**Returns true if the audiofile is at the end*/
 	public boolean isFinished() {
 		return currentLoc.get()==-1;
 	}
 
-	/**Converts frames to seconds for the current song*/ 
 	public int framesToSeconds(int frames) {
-		return frames / framesPerSec;
+		return frames / framesPerSec / numTracks;
 	}
-	
-	/**Returns the position of the song in seconds*/
-	public int positionInSeconds() {
+
+	public int getCurrentPosInSeconds() {
 		return framesToSeconds(getCurrentPos());
+	}
+
+	public int getSizeInSeconds() {
+		return framesToSeconds(getSize());
+	}
+
+	public void setPosition(int posInFrames) {
+		reboot();
+		try {
+			ais.skip(posInFrames);
+		} catch (IOException e) {e.printStackTrace();}
+		currentLoc.getAndSet(posInFrames);
 	}
 }
 

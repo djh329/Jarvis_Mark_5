@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 //import javax.swing.Timer;
 
-import structures.FlaggedThread;
+import structures.FlaggedTimer;
 import structures.ScrollerController;
 
 import java.awt.FlowLayout;
@@ -113,7 +113,7 @@ public class MusicScroller extends JPanel {
 
 
 							setPos(curPos);
-							System.out.println(myAudioFile.positionInSeconds());
+							System.out.println(myAudioFile.getCurrentPosInSeconds());
 							
 
 						}
