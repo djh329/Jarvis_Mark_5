@@ -14,6 +14,7 @@ import javax.swing.Timer;
 public class MusicScroller2 extends JPanel{
 
 	private int XPosOnLine=0;
+	private int barHeight=5;
 	private AudioFile af;
 	private Timer t;
 	private boolean isRunning=false;
@@ -31,18 +32,18 @@ public class MusicScroller2 extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				double curFrac = ((double) af.getCurrentPos())/af.getSize();
-				if(curFrac>=0 && isRunning) {
+				if(!af.isFinished() && isRunning) {
 					setPos(curFrac);
 					repaint();
 					System.out.println("Im repainting: music scroller bar");
 				}
 				else {
 					System.out.println("in the else part: music scroller bar\t" + t.isRunning());
-					if(af.getCurrentPos()<0) {
-						setPos(0);
-					}
+					setPos(curFrac);
 					repaint();
-					t.stop();
+					if(!isRunning) {
+						((Timer)e.getSource()).stop();
+					}
 				}
 
 			}
@@ -63,14 +64,14 @@ public class MusicScroller2 extends JPanel{
 	@Override
 	public void paint(Graphics g) {
 		g.setColor(Color.green);
-		g.fillRect(0, 0, this.getWidth(), 5);
+		g.fillRect(0, 0, this.getWidth(), barHeight);
 		g.setColor(Color.red);
-		g.fillOval(XPosOnLine, 0, 5, 5);
+		g.fillOval(XPosOnLine, 0, barHeight, barHeight);
 	}
 
 
 	public void setPos(double frac) {
-		XPosOnLine = (int)(frac * this.getWidth());
+		XPosOnLine = (int)(frac * (this.getWidth()-barHeight*2));
 	}
 
 	private int getBarWidth() {
@@ -90,9 +91,6 @@ public class MusicScroller2 extends JPanel{
 				if(e.getX()>0 && e.getX()<getBarWidth()) {
 					af.setPosition((int)(af.getSize() * ((double)e.getX())/getBarWidth()));
 				}
-//				double curFrac = ((double) af.getCurrentPos())/af.getSize();
-//				setPos(curFrac);
-//				repaint();
 			}
 
 			@Override

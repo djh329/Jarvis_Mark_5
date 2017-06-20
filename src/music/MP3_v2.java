@@ -27,6 +27,7 @@ public class MP3_v2 implements AudioFile {
 	int numTracks;
 	private static AtomicInteger currentLoc=new AtomicInteger(0);
 	private boolean isPlaying;
+	private boolean isFinished;
 	DataLine.Info info = new DataLine.Info(SourceDataLine.class, aForm);
 	SourceDataLine sourceLine = null;
 	int readSize=8000;
@@ -86,6 +87,7 @@ public class MP3_v2 implements AudioFile {
 			aForm = ais.getFormat();
 			framesPerSec = (int) aForm.getFrameRate();
 			numTracks=ais.getFormat().getChannels();
+			isFinished=false;
 			System.out.println("Frame rate: " + framesPerSec);
 		}
 		catch (UnsupportedAudioFileException e) {e.printStackTrace();}
@@ -99,8 +101,12 @@ public class MP3_v2 implements AudioFile {
 			public void run() {
 				try {
 					int nBytesRead=0;
-					if(currentLoc.get()==-1)
-						currentLoc.getAndSet(0);
+					if(isFinished) {
+						System.out.println("in isFinished block, about to reboot:\t"+currentLoc.get());
+						reboot();
+						ais.skip(currentLoc.get());
+						isFinished=false;
+					}
 					sourceLine = (SourceDataLine) AudioSystem.getLine(info);
 					sourceLine.open(aForm);
 					sourceLine.start();
@@ -111,7 +117,12 @@ public class MP3_v2 implements AudioFile {
 							currentLoc.addAndGet(sourceLine.write(abData, 0, nBytesRead));
 						}
 						else {
-							currentLoc.getAndSet(-1);
+							//We want this called only once despite still being in the loop
+							if(!isFinished) {
+								isFinished=true;
+								reboot();
+								currentLoc.getAndSet(0);
+							}
 						}
 					}
 					sourceLine.drain();
@@ -173,7 +184,7 @@ public class MP3_v2 implements AudioFile {
 	}
 
 	public boolean isFinished() {
-		return currentLoc.get()==-1;
+		return isFinished;
 	}
 
 	public int framesToSeconds(int frames) {

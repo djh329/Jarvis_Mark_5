@@ -38,6 +38,6 @@ public interface AudioFile {
 	public int getCurrentPosInSeconds();
 	
 	/**Sets the position of the audiofile to the given frame*/
-	public void setPosition(int posInFrames);	
+	public void setPosition(int posInFrames);		
 
 }

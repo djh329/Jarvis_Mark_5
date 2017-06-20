@@ -124,7 +124,7 @@ public class audioGUI extends JFrame {
 
 	public void play() {
 		if(myAudioFile.isFinished())
-			restart();
+			myAudioFile.play();
 		else if(!myAudioFile.isPlaying()) {
 			myAudioFile.play();
 			//mscScroll.start();
