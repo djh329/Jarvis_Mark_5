@@ -132,7 +132,7 @@ public class audioGUI extends JFrame {
 		}
 
 	}
-
+ 
 	public void pause() {
 		if(myAudioFile.isPlaying()) {
 			myAudioFile.pause();
